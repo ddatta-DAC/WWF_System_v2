@@ -330,6 +330,8 @@ def create_train_test_sets():
 
     train_master_df = get_data('train')
     test_master_df = get_data('test')
+    train_master_df = train_master_df.head(10000)
+    test_master_df = test_master_df.head(10000)
 
     print(' Train initial :: ', len(train_master_df))
     print(' Test initial :: ', len(test_master_df))
