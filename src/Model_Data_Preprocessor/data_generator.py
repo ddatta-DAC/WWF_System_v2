@@ -56,6 +56,8 @@ def set_up_config(dir,case):
         DIR,
         SUB_DIR
     )
+    if not os.path.exists(INPUT_DIR):
+        return False
     if not os.path.exists(os.path.join(CONFIG['save_dir'])):
         os.mkdir(os.path.join(CONFIG['save_dir']))
     if not os.path.exists(os.path.join(CONFIG['save_dir'],DIR)):
@@ -75,7 +77,7 @@ def set_up_config(dir,case):
     freq_bound = CONFIG[DIR]['low_freq_bound']
     column_value_filters = CONFIG[DIR]['column_value_filters']
     num_neg_samples = CONFIG[DIR]['num_neg_samples']
-    return
+    return True
 
 
 def get_data(_type):
@@ -627,7 +629,10 @@ def main(
         dir = None,
         case = None
 ):
-    set_up_config(dir,case)
+    validation = set_up_config(dir,case)
+    if not validation:
+        return
+
     create_train_test_sets()
     create_negative_samples_v1()
     create_model_data_v1()
