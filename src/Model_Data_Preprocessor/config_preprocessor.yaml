@@ -52,7 +52,6 @@
   'use_cols':
     - 'PanjivaRecordID'
     - 'AdminRegion'
-    - 'CountryOfSale'
     - 'hscode_6'
     - 'ShipmentDestination'
     - 'Province'

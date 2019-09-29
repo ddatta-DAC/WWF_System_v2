@@ -102,6 +102,7 @@ def get_data(_type):
             index_col = None,
             low_memory=False
         )
+    df = df.dropna()
     return df
 
 
@@ -126,7 +127,7 @@ def convert_to_ids(
         save_dir
 ):
     global id_col
-
+    print('data_generator :: convert_to_ids' )
     feature_columns = list(df.columns)
     feature_columns.remove(id_col)
     domain_dims_dict = {}
@@ -268,26 +269,28 @@ returns c random items as a dict
 column_name : item_id
 '''
 
+#
+# def get_c_vals(anomaly_cols, col_val2id_dict):
+#     res_dict = {}
+#     for col in anomaly_cols:
+#         res_dict[col] = random.sample(list(col_val2id_dict[col].values()), 1)[0]
+#     return res_dict
 
-def get_c_vals(anomaly_cols, col_val2id_dict):
-    res_dict = {}
-    for col in anomaly_cols:
-        res_dict[col] = random.sample(list(col_val2id_dict[col].values()), 1)[0]
-    return res_dict
 
-
-def setup_testing_data(test_df, train_df, col_val2id_dict):
+def setup_testing_data(test_df, col_val2id_dict):
     global id_col
-    rare_occurrence_PanjivaIDs = None
 
     # Replace with None if ids are not in train_set
     feature_cols = list(test_df.columns)
     feature_cols.remove(id_col)
+
     init_PanjivaID_list =  list(test_df[id_col])
+
 
     for col in feature_cols:
         valid_items = list(col_val2id_dict[col].keys())
         test_df = test_df.loc[test_df[col].isin(valid_items)]
+    print(test_df.columns)
 
     final_PanjivaID_list =  list(test_df[id_col])
     rare_occurrence_PanjivaIDs = set(init_PanjivaID_list).difference(final_PanjivaID_list)
@@ -308,17 +311,18 @@ def setup_testing_data(test_df, train_df, col_val2id_dict):
         )
 
     print(' Length of test df :: ', len(test_df))
-    new_test_df = pd.DataFrame(columns=list(test_df.columns))
+    # new_test_df = pd.DataFrame(columns=list(test_df.columns))
 
     # for i, row in test_df.iterrows():
     #     if validate(row, train_df):
     #         new_test_df = new_test_df.append(row, ignore_index=True)
 
-    print(' After deduplication :: ', len(new_test_df))
+    print(' After deduplication :: ', len(test_df))
 
-    return new_test_df, rare_occurrence_PanjivaIDs
+    return test_df, rare_occurrence_PanjivaIDs
 
 def create_train_test_sets():
+
     global use_cols
     global DIR
     global save_dir
@@ -327,8 +331,8 @@ def create_train_test_sets():
     train_master_df = get_data('train')
     test_master_df = get_data('test')
 
-    print(' Train initial ', len(train_master_df))
-    print(' Test initial ', len(test_master_df))
+    print(' Train initial :: ', len(train_master_df))
+    print(' Test initial :: ', len(test_master_df))
 
     '''
     test data preprocessing
@@ -353,10 +357,8 @@ def create_train_test_sets():
         train_master_df_1,
         save_dir
     )
-
     new_test_df, rare_occurrence_PanjivaIDs = setup_testing_data(
         test_master_df,
-        train_master_df_2,
         col_val2id_dict
     )
     series_RareOcc = pd.Series(list(rare_occurrence_PanjivaIDs))
@@ -624,7 +626,7 @@ def create_model_data_v1():
             pickle.HIGHEST_PROTOCOL
         )
 
-
+# ----------------------------------------------------------------------------- #
 def main(
         dir = None,
         case = None
@@ -639,6 +641,8 @@ def main(
     create_model_data_v1()
     return
 
+
+# ------------------------------------------------------------------------------- #
 parser = argparse.ArgumentParser(description='Generate data for the ML model')
 parser.add_argument(
     '--dir',
@@ -656,9 +660,7 @@ parser.add_argument(
 
 
 args = parser.parse_args()
-print(args.dir)
-print(args.case)
-
+print('Calling data_generator:::', args.dir, args.case)
 main(
     dir = args.dir,
     case = args.case
