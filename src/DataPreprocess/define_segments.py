@@ -88,7 +88,7 @@ Window lengths:
 def main():
     old_path = os.getcwd()
     cur_path = get_cur_path()
-    os.chdir(cur_path)
+    # os.chdir(cur_path)
 
     DATA_LOC = './../../Data'
     config_dict = {
@@ -120,7 +120,7 @@ def main():
             outfile
         )
 
-    os.chdir(old_path)
+    # os.chdir(old_path)
     return
 
 
