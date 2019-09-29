@@ -1,0 +1,47 @@
+china_import:
+  'process': True
+  'use_cols':
+    - 'PanjivaRecordID'
+    - 'ConsigneePanjivaID'
+    - 'ShipmentOrigin'
+    - 'Province'
+    - 'CountryOfSale'
+    - 'TransportMethod'
+    - 'AdminRegion'
+    - 'TradeType'
+    - 'hscode_6'
+china_export:
+  'process': True
+  'use_cols':
+    - 'PanjivaRecordID'
+    - 'AdminRegion'
+    - 'hscode_6'
+    - 'ShipmentDestination'
+    - 'Province'
+    - 'ShipperPanjivaID'
+    - 'TradeType'
+    - 'TransportMethod'
+'us_import':
+  'process': True
+  'use_cols':
+    - 'PanjivaRecordID'
+    - 'ConsigneePanjivaID'
+    - 'ShipperPanjivaID'
+    - 'ShipmentOrigin'
+    - 'ShipmentDestination'
+    - 'hscode_6'
+    - 'PortOfUnlading'
+    - 'PortOfLading'
+    - 'Carrier'
+'peru_export':
+  'process': True
+  'use_cols':
+    - 'PanjivaRecordID'
+    - 'ShipmentDestination'
+    - 'hscode_6'
+    - 'ShipperPanjivaID'
+    - 'PortOfUnladingUNLOCODE'
+    - 'CustomsCode'
+    - 'TransportMethod'
+    - 'LocationCode'
+
