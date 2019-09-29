@@ -59,7 +59,7 @@ def process_dir(
         op_path,
         config
 ):
-    n_jobs = 10
+
     op_dir = os.path.join(op_path, dir)
     if not os.path.exists(op_dir):
         os.mkdir(op_dir)
@@ -105,7 +105,7 @@ def process_dir(
         train_df = combine_csv_files_1(files_train, valid_cols)
 
         op_subdir = os.path.join(
-            op_path,
+            op_dir,
             str(case)
         )
         if not os.path.exists(op_subdir):

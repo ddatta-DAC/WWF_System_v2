@@ -24,15 +24,14 @@ def create_segments(
         train_window=4,
         test_window=2
 ):
-    loc = os.path.join(DATA_LOC, DIR)
-    all_files = sorted(glob.glob(os.path.join(loc, '**.csv')))
-    print(all_files)
+
     min_mm = 1
     min_yy = 2015
     max_mm = 12
     max_yy = 2017
 
     signature_dict = {}
+
     _mm = min_mm
     _yy = min_yy
     _idx = 1
@@ -61,15 +60,11 @@ def create_segments(
         _train_files = []
         for j in range(st_tr_idx, end_tr_idx + 1):
             sig = signature_dict[j]
-            # f = glob.glob(os.path.join(loc, '*' + sig + '.csv'))
-            # _train_files.extend(f)
             _train_files.append(sig)
 
         _test_files = []
         for j in range(st_t_idx, end_t_idx + 1):
             sig = signature_dict[j]
-            # f = glob.glob(os.path.join(loc, '*' + sig + '.csv'))
-            # _test_files.extend(f)
             _test_files.append(str(sig))
         segment_dict[i] = {
             'train': _train_files,
@@ -98,13 +93,13 @@ def main():
     DATA_LOC = './../../Data'
     config_dict = {
         'us_import': {'train': 6,
-                      'test': 3},
+                      'test': 3 },
         'china_export': {'train': 6,
                          'test': 3},
-        'china_import': {'train': 9,
-                         'test': 3},
+        'china_import': {'train': 8,
+                         'test': 4},
         'peru_export': {'train': 24,
-                        'test': 12}
+                        'test': 6}
     }
 
     result = {}
@@ -115,6 +110,7 @@ def main():
             conf['train'],
             conf['test']
         )
+
         result[key] = _res
 
     # write to yaml
