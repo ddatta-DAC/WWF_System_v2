@@ -1,1 +1,9 @@
 /venv/
+/Data/.ipynb_checkpoints/
+/Data/
+/Data/china_import/.ipynb_checkpoints/
+/Data/
+/Data/china_export/.ipynb_checkpoints/
+/metadata/.ipynb_checkpoints/
+**/__pycache__
+**/**.pyc
