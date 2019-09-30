@@ -45,6 +45,7 @@ def combine_csv_files_1(file_list, valid_cols):
             df = tmp_df
         else:
             df = df.append(tmp_df, ignore_index=True)
+    print(' combine_csv_files_1 :> ', len(df))
     return df
 
 

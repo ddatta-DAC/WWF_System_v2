@@ -82,7 +82,7 @@ def process_file(
         low_memory=False,
         usecols=valid_cols
     )
-
+    print(' >> ', len(df))
     if len(df) == 0:
         return
     df = df.dropna(how='any', subset=['HSCode'])
@@ -106,6 +106,7 @@ def process_file(
         axis=1,
         args=(regex_str,)
     )
+    print(' Length of df after filtering hs codes:: ', len(df))
     df = df.dropna(how='any', subset=['HSCode'])
     df['HSCode'] = df['HSCode'].astype(int)
 
@@ -118,6 +119,7 @@ def process_file(
         return
 
     f_name = (file_path.split('/')[-1]).split('.')[0] + '_filtered' + '.csv'
+    print(f_name)
     op_file_path = os.path.join(op_dir, f_name)
 
     df.to_csv(op_file_path, index=None)
@@ -146,7 +148,7 @@ def process_dir(
         op_path,
         config
 ):
-    n_jobs = 5
+    n_jobs = 4
     op_dir = os.path.join(op_path, _dir)
 
     if not os.path.exists(op_dir):
@@ -164,7 +166,7 @@ def process_dir(
     )
 
     files = glob.glob(csv_files_path + '/*.csv')
-
+    print( ' > ',files)
     Parallel(n_jobs=n_jobs)(
         delayed(process_file)(
             _file, valid_cols, op_dir, _dir
@@ -183,6 +185,7 @@ def main():
         '..',
         'Data'
     )
+   
     op_path = os.path.join(
         cur_path,
         '..',
