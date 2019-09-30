@@ -34,8 +34,7 @@ def get_config():
 
 
 def get_hs_code_regex(_dir):
-    global cur_path
-
+    cur_path = get_cur_path()
     file = os.path.join(
         cur_path,
         '..',

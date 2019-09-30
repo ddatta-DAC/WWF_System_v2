@@ -116,13 +116,13 @@ def process_dir(
 
         test_df.to_csv(
             os.path.join(
-                op_subdir, op_f_name_train
+                op_subdir, op_f_name_test
             )
         )
 
         train_df.to_csv(
             os.path.join(
-                op_subdir, op_f_name_test
+                op_subdir, op_f_name_train
             )
         )
 
