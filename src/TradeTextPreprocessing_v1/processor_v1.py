@@ -298,7 +298,6 @@ def main():
 
     for file_path in files_paths:
         df = get_data(DIR, file_path)
-        df = df.head(1000)
         df = nlp_task(
             df,
             DIR,
