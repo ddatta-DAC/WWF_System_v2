@@ -1,0 +1,46 @@
+'DATA_DIR': './../../GeneratedData/FilteredData'
+'DIR': 'china_import'
+'MAX_NGRAM_LENGTH' : 3
+'output_loc': './../../GeneratedData/HDF/TradeDataTextFlags'
+'hscode_col_name': 'HSCode'
+'us_import':
+  'text_col_type': 1
+  'text_col': 'GoodsShipped'
+  'usecols':
+    - 'PanjivaRecordID'
+    - 'GoodsShipped'
+    - 'hscode_6'
+  'hscode_col': 'HSCode'
+'china_import':
+  'text_col_type': 2
+  'hscode_col': 'HSCode'
+  'text_col': 'HSCodeKeywords'
+  'usecols':
+    - 'PanjivaRecordID'
+    - 'HSCodeKeywords'
+    - 'hscode_6'
+'china_export':
+  'text_col_type': 2
+  'text_col': 'HSCodeKeywords'
+  'hscode_col': 'HSCode'
+  'usecols':
+    - 'PanjivaRecordID'
+    - 'HSCodeKeywords'
+    - 'hscode_6'
+'peru_export':
+  'text_col_type': 1
+  'text_col': 'GoodsShipped'
+  'hscode_col': 'HSCode'
+  'usecols':
+    - 'PanjivaRecordID'
+    - 'GoodsShipped'
+    - 'hscode_6'
+'source_keywords_loc': './../../WWF_Domain_Data_v1/GeneratedData/Keywords'
+'source_keywords_files':
+  - 'CITES_common_names.txt'
+  - 'CITES_sc_name.txt'
+  - 'IUCN_RedList_common_names.txt'
+  - 'IUCN_RedList_sc_name.txt'
+  - 'WWF_HighRisk_common_names.txt'
+  - 'WWF_HighRisk_sc_name.txt'
+
