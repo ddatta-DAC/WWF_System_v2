@@ -24,40 +24,7 @@ from joblib import Parallel, delayed
 '''
 Set up config
 '''
-CONFIG = None
-cur_path =  None
-def get_cur_path():
-    this_file_path = '/'.join(
-        os.path.abspath(
-            inspect.stack()[0][1]
-        ).split('/')[:-1]
-    )
-    os.chdir(this_file_path)
-    return this_file_path
 
-def setup_config():
-    global CONFIG
-    config_file = 'text_preproc_config_v1.yaml'
-    with open(config_file) as f:
-        CONFIG = yaml.safe_load(f)
-    return CONFIG
-
-def setup():
-    global cur_path
-    global CONFIG
-
-    setup_config()
-    cur_path = get_cur_path()
-    # set up output location
-    op_loc = CONFIG['output_loc']
-
-    if not os.path.exists(op_loc):
-        os.mkdir(op_loc)
-    DIR = CONFIG['DIR']
-    if not os.path.exists(os.path.join(op_loc,DIR)):
-        os.mkdir(os.path.join(op_loc,DIR))
-    return
-setup()
 
 
 '''
@@ -66,12 +33,7 @@ Method is tailored for pandas column vectorized (speed optimal)
 '''
 
 
-def get_file_paths(DATA_DIR):
-    print(os.path.join(DATA_DIR, 'panjiva_*.csv'))
-    all_files = sorted(glob.glob(
-        os.path.join(DATA_DIR, 'panjiva_*.csv')
-    ))
-    return all_files
+
 
 def ngrams(input_word_list, n=1):
     output = []
@@ -80,8 +42,7 @@ def ngrams(input_word_list, n=1):
     return output
 
 
-def get_data(DIR, file_path):
-    global CONFIG
+def get_data(CONFIG, DIR, file_path):
     usecols = CONFIG[DIR]['usecols']
     print('use cols',usecols)
     print(file_path)
@@ -189,9 +150,10 @@ def divide_DF(inp_df, num_chunks=10):
 # match keywords based on a keywords list
 # keywords list should be curated from the different sources
 # =============== #
-def match_keywords(row , keywords_list):
-    if type(row['ngrams'])!= str : return 0
-    candidates = (row['ngrams']).split(';')
+
+def match_keywords(_input , keywords_list):
+    if type(_input)!= str : return 0
+    candidates = (_input).split(';')
     for c in candidates:
         if c in keywords_list:
             return 1
@@ -202,9 +164,11 @@ def match_keywords(row , keywords_list):
 # ============ #
 def process(
         df,
+        CONFIG,
         DIR,
         master_keywords_list
 ):
+
     text_col = CONFIG[DIR]['text_col']
     MAX_NGRAM_LENGTH = CONFIG['MAX_NGRAM_LENGTH']
     df = df.reset_index(drop=True)
@@ -231,8 +195,8 @@ def process(
 
     return df
 
-def get_master_keywords_list():
-    global CONFIG
+def get_master_keywords_list(CONFIG):
+
     res = []
     loc = CONFIG['source_keywords_loc']
     files = CONFIG['source_keywords_files']
@@ -245,19 +209,18 @@ def get_master_keywords_list():
     res = list(set(res))
     return res
 
-def nlp_task(df, DIR, num_jobs=100):
+def nlp_task(df, CONFIG, DIR, num_jobs=100):
 
-    global CONFIG
-    master_keywords_list = get_master_keywords_list()
+    master_keywords_list = get_master_keywords_list(CONFIG)
     hscode_col = CONFIG[DIR]['hscode_col']
     text_col = CONFIG[DIR]['text_col']
-
+    ngrams_col = 'ngrams'
     list_dfs = divide_DF(df)
     result_df_list = Parallel(
         n_jobs=num_jobs,
         prefer="threads")(
         delayed(process)
-        (_df, DIR , master_keywords_list) for _df in list_dfs
+        (_df, CONFIG, DIR , master_keywords_list) for _df in list_dfs
     )
 
     result_df = None
@@ -265,7 +228,7 @@ def nlp_task(df, DIR, num_jobs=100):
     # Join the chunks
     # -----
     for _df in result_df_list:
-        cols_to_remove = [hscode_col, text_col]
+        cols_to_remove = [hscode_col, text_col, ngrams_col]
         for c in cols_to_remove:
             try:
                 del _df[c]
@@ -278,36 +241,27 @@ def nlp_task(df, DIR, num_jobs=100):
 
     return result_df
 
-def main():
-    global CONFIG
-
-    DATA_DIR = os.path.join(
-        CONFIG['DATA_DIR'],
-        CONFIG['DIR']
-    )
+def invoke(CONFIG ,file_path):
     DIR = CONFIG['DIR']
 
-    # List of all the files
-    files_paths = get_file_paths(DATA_DIR)
-
     op_loc = CONFIG['output_loc']
+    _tmp = '_'.join((file_path.split('/'))[-1].split('_')[-3:])
+    df_name = 'text_flags_' + _tmp
     op_df_loc = os.path.join(
         op_loc,
         DIR
     )
 
-    for file_path in files_paths:
-        df = get_data(DIR, file_path)
-        df = nlp_task(
-            df,
-            DIR,
-            100
-        )
-        _tmp = '_'.join((file_path.split('/'))[-1].split('_')[-2:])
-        df_name = 'text_flags_' + _tmp
-        print(df_name)
-        _df_path = os.path.join(op_df_loc, df_name)
-        df.to_csv(_df_path, index=False)
-    return
+    op_df_path = os.path.join(op_df_loc, df_name)
 
-main()
+    df = get_data(CONFIG, DIR, file_path)
+
+    df = nlp_task(
+        df,
+        CONFIG,
+        DIR,
+        100
+    )
+
+    df.to_csv(op_df_path, index=False)
+    return op_df_path
