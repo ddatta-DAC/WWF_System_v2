@@ -70,7 +70,7 @@ def main():
     num_proc = min(40,num_files)
     pool = mp.Pool(processes=num_proc)
     print(pool)
-    results = [pool.apply_async( process_data, args=(CONFIG, file_path,)) for file_path in files_paths[:4] ]
+    results = [pool.apply_async( process_data, args=(CONFIG, file_path,)) for file_path in files_paths ]
     output = [p.get() for p in results]
     print(output)
     return
