@@ -4,7 +4,7 @@ import inspect
 import yaml
 import sys
 import glob
-
+import argparse
 
 
 CONFIG = None
@@ -25,16 +25,23 @@ def setup_config():
         CONFIG = yaml.safe_load(f)
     return CONFIG
 
-def setup():
+def setup(dir=None):
 
     CONFIG = setup_config()
+
+    if dir is not None:
+        CONFIG['DIR'] = dir
+        DIR = dir
+    else:
+        DIR = CONFIG['DIR']
+
     cur_path = get_cur_path()
     # set up output location
     op_loc = CONFIG['output_loc']
 
     if not os.path.exists(op_loc):
         os.mkdir(op_loc)
-    DIR = CONFIG['DIR']
+
     if not os.path.exists(os.path.join(op_loc,DIR)):
         os.mkdir(os.path.join(op_loc,DIR))
     return CONFIG, cur_path
@@ -47,7 +54,8 @@ def get_file_paths(DATA_DIR):
     return all_files
 
 
-def process_data(CONFIG,file_path):
+def process_data(CONFIG, file_path):
+
     try:
         from . import processor_v1
     except:
@@ -56,9 +64,9 @@ def process_data(CONFIG,file_path):
     r = processor_v1.invoke(CONFIG, file_path)
     return r
 
-def main():
-    CONFIG, cur_path= setup()
+def main(dir):
 
+    CONFIG, cur_path= setup(dir)
     DATA_DIR = os.path.join(
         CONFIG['DATA_DIR'],
         CONFIG['DIR']
@@ -75,4 +83,20 @@ def main():
     print(output)
     return
 
-main()
+# ------------------------------------------------------------------------------- #
+parser = argparse.ArgumentParser(description='Generate data for the ML model')
+parser.add_argument(
+    '--dir',
+    nargs='?',
+    type=str,
+    help=' < Data source > ',
+    choices=['us_import', 'china_import', 'china_export','peru_export']
+)
+
+
+args = parser.parse_args()
+print('Calling data_generator:::', args.dir, args.case)
+main(
+    dir = args.dir
+)
+
