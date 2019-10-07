@@ -1,0 +1,15 @@
+DATA_DIR : './../../GeneratedData/SegmentedData_Model'
+model_save_dir : './SAVED_MODEL_DATA'
+OP_DIR : './../../Model_Output'
+RESULT_DIR  : './../../Model_Results'
+MODEL_NAME : 'mead'
+china_export:
+  emb_dims : 16
+  num_neg_samples : 10
+  id_col : 'PanjivaRecordID'
+  learning_rate : 0.0025
+  num_epochs: 100
+  batchsize : 512
+  show_loss_figure : False
+  save_loss_figure : False
+

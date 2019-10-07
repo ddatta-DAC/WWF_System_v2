@@ -11,7 +11,6 @@ from tensorflow.python.framework.graph_util import convert_variables_to_constant
 import time
 import inspect
 import matplotlib.pyplot as plt
-tf.random.set_random_seed(729)
 
 class model:
     def __init__(
@@ -52,11 +51,16 @@ class model:
         self.learning_rate = learning_rate
         self.num_domains = len(domain_dims)
         self.domain_dims = domain_dims
-        self.num_emb_layers = len(emb_dims)
-        self.emb_dims = emb_dims
+        if type(emb_dims) == list:
+            self.num_emb_layers = len(emb_dims)
+            self.emb_dims = emb_dims
+        else:
+            self.num_emb_layers = 1
+            self.emb_dims = [emb_dims]
+
         self.batch_size = batch_size
         self.num_epochs = num_epochs
-        self.model_signature = MODEL_NAME + '_'.join([str(e) for e in emb_dims])
+        self.model_signature = MODEL_NAME + '_'.join([str(e) for e in self.emb_dims])
         self.use_bias = use_bias
         self.num_neg_samples = num_neg_samples
         self.summary_data_loc = os.path.join(
@@ -291,12 +295,9 @@ class model:
 
     def build_model(self):
 
-        # print('Building model : start ')
         self.model_scope_name = 'model'
-
         with tf.variable_scope(self.model_scope_name):
             # batch_size ,domains, label_id
-
             self.x_pos_inp = tf.placeholder(
                 tf.int32,
                 [None, self.num_domains]
@@ -311,8 +312,6 @@ class model:
             )
 
             emb_op_pos = self.get_inp_embeddings(x_pos_inp)
-            # print(' emb_op_pos shape ', emb_op_pos[0].shape)
-
             self.joint_emb_op_arr = emb_op_pos
 
             '''
@@ -320,7 +319,6 @@ class model:
             '''
 
             self.r_b = self.get_norm_b(self.joint_emb_op_arr)
-            # print(' > self.r_b ', self.r_b.shape)
 
             '''
             Optimization stage
@@ -353,9 +351,9 @@ class model:
             # print(norm_loss.shape)
 
             self.loss_2 = norm_loss
-
-            self.loss =  self.loss_3 + self.loss_2
+            self.loss =  self.loss_1 + self.loss_2
             print(' shape of loss -->> ', self.loss.shape)
+
             tf.summary.scalar('loss', tf.reduce_mean(self.loss))
 
             self._add_var_summaries()
@@ -373,7 +371,8 @@ class model:
             )
 
             self.gradients = gvs
-            tf.summary.all_v2_summary_ops()
+
+            tf.contrib.summary.all_summary_ops()
             capped_gvs = [
                 (tf.clip_by_value(grad, -1.0, 1.0), var)
                 for grad, var in gvs if grad is not None
