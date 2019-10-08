@@ -34,6 +34,11 @@ class model:
         self.lambda_3 = 1
         self._enable_l2_loss = True
 
+        if not os.path.exists(os.path.join(self.save_dir, 'checkpoints')):
+            os.mkdir(
+                os.path.join(self.save_dir, 'checkpoints')
+            )
+
         return
 
     def set_model_hyperparams(
@@ -199,7 +204,10 @@ class model:
         if self.frozen_file is None:
             # ensure embedding dimensions are correct
             emb = '_'.join([str(_) for _ in self.emb_dims])
-            files = glob.glob(os.path.join(self.save_dir, 'checkpoints', '*' + emb + '*.pb'))
+            files = list(sorted(
+                glob.glob(
+                    os.path.join(self.save_dir, 'checkpoints',  '*' + emb + '*.pb'))
+            ))
             f_name = files[-1]
             self.frozen_file = f_name
 
@@ -482,6 +490,7 @@ class model:
         # print('Start of training :: ')
         self.ts = str(time.time()).split('.')[0]
         f_name = 'frozen' + '_' + self.model_signature + '_' + self.ts + '.pb'
+
 
         self.frozen_file = os.path.join(
             self.save_dir, 'checkpoints', f_name

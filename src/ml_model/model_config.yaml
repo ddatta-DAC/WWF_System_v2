@@ -3,6 +3,7 @@ model_save_dir : './SAVED_MODEL_DATA'
 OP_DIR : './../../Model_Output'
 RESULT_DIR  : './../../Model_Results'
 MODEL_NAME : 'mead'
+id_col : 'PanjivaRecordID'
 china_export:
   emb_dims : 16
   num_neg_samples : 8

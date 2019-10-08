@@ -147,7 +147,8 @@ def set_up_model(
         dir,
         case
 ):
-    SUBDIR = 'dataset_'+ str(case)
+    SUBDIR =  str(case)
+    embedding_dims = config[dir]['emb_dims']
     embedding_dims = config[dir]['emb_dims']
     MODEL_NAME = '_'.join( [config['MODEL_NAME'], 'case', SUBDIR])
     model_obj = tf_model.model(
