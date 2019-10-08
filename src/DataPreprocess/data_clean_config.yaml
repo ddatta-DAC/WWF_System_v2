@@ -1,5 +1,5 @@
 china_import:
-  process: True
+  process: False
   'use_cols':
     - 'PanjivaRecordID'
     - 'ConsigneePanjivaID'
@@ -24,8 +24,9 @@ china_export:
     - 'TradeType'
     - 'TransportMethod'
     - 'HSCodeKeywords'
+    - 'CountryOfSale'
 us_import:
-  process: True
+  process: False
   'use_cols':
     - 'PanjivaRecordID'
     - 'ConsigneePanjivaID'
@@ -39,7 +40,7 @@ us_import:
     - 'Carrier'
     - 'GoodsShipped'
 peru_export:
-  process: True
+  process: False
   'use_cols':
     - 'PanjivaRecordID'
     - 'ShipmentDestination'

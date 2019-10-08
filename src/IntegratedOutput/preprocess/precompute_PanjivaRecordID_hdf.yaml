@@ -1,0 +1,21 @@
+'dirs':
+  - china_import
+  - china_export
+  - us_import
+  - peru_export
+'hs_code_metadata_file' : ../../metadata/collated_hscode_filters.csv
+'leb_metadata_file' : ../../metadata/LEB_hscode_country.csv
+'SRC_DIR': ../../generated_data
+'TARGET_DIR' : ../../generated_data/HDF
+'china_import' :
+  'CountryOfOrigin' : 'CountryOfSale'
+  'max' : 3
+'china_export' :
+  'CountryOfOrigin' : 'CountryOfSale'
+  'max' : 3
+'us_import' :
+  'CountryOfOrigin' : 'ShipmentOrigin'
+  'max' : 3
+'peru_export' :
+  'CountryOfOrigin' : None
+  'max' : 2

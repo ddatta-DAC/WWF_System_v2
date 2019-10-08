@@ -1,0 +1,2 @@
+MODEL_RESULTS_LOC: './../../Model_Results'
+HDF_LOC : './../../WWF_Domain_Data_v1/GeneratedData'
