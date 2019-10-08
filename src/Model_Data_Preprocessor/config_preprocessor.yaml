@@ -58,6 +58,7 @@
     - 'ShipperPanjivaID'
     - 'TradeType'
     - 'TransportMethod'
+    - 'CountryOfSale'
   'num_neg_samples': 8
   'column_value_filters': False
   'low_freq_bound': 1
