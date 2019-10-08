@@ -8,7 +8,7 @@ china_export:
   num_neg_samples : 8
   id_col : 'PanjivaRecordID'
   learning_rate : 0.0025
-  num_epochs: 100
+  num_epochs: 1
   batchsize : 512
   show_loss_figure : False
   save_loss_figure : False

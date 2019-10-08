@@ -68,6 +68,8 @@ def set_up_config(
         os.mkdir(os.path.join(CONFIG['OP_DIR']))
     if not os.path.exists(os.path.join(CONFIG['OP_DIR'], DIR)):
         os.mkdir(os.path.join(CONFIG['OP_DIR'], DIR))
+    if not os.path.exists(os.path.join(CONFIG['OP_DIR'], DIR, SUB_DIR)):
+        os.mkdir(os.path.join(CONFIG['OP_DIR'], DIR, SUB_DIR))
 
     OP_DIR = os.path.join(
         CONFIG['OP_DIR'],
