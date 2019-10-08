@@ -114,7 +114,6 @@ def fetch_data(DATA_DIR):
 
     train_x_neg_file = os.path.join(
         DATA_DIR,
-        DIR,
         'negative_samples_v1.pkl'
     )
 
@@ -212,7 +211,6 @@ def main( dir, case ):
         results_op_path,
         index=None
     )
-
     return
 
 
