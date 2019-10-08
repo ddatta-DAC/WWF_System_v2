@@ -86,6 +86,7 @@ def set_up_config(
         os.mkdir(os.path.join(CONFIG['RESULT_DIR']))
     if not os.path.exists(os.path.join(CONFIG['RESULT_DIR'], DIR)):
         os.mkdir(os.path.join(CONFIG['RESULT_DIR'], DIR))
+
     RESULT_DIR = os.path.join(
         CONFIG['RESULT_DIR'],
         DIR,
@@ -180,6 +181,9 @@ def set_up_model(
 
 def main( dir, case ):
     CONFIG, DATA_DIR, MODEL_SAVE_DIR, OP_DIR, RESULT_DIR, SUB_DIR = set_up_config( dir, case )
+    if CONFIG[dir]['process'] is False:
+        return 0
+
     model_obj = set_up_model(
         CONFIG,
         DATA_DIR,
@@ -215,7 +219,7 @@ def main( dir, case ):
         results_op_path,
         index=None
     )
-    return
+    return 1
 
 
 # ------------------------------------------------------------------------------- #
