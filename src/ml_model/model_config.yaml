@@ -5,7 +5,7 @@ RESULT_DIR  : './../../Model_Results'
 MODEL_NAME : 'mead'
 china_export:
   emb_dims : 16
-  num_neg_samples : 10
+  num_neg_samples : 8
   id_col : 'PanjivaRecordID'
   learning_rate : 0.0025
   num_epochs: 100

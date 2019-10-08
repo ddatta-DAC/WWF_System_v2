@@ -135,7 +135,6 @@ def fetch_data(DATA_DIR):
     return train_x_pos, train_x_neg, test_pos, domain_dims
 
 
-
 def set_up_model(
         config,
         DATA_DIR,
