@@ -6,6 +6,10 @@ import sys
 import glob
 import argparse
 
+try:
+    from src.ml_model import main_model_exec
+except:
+    import main_model_exec
 
 CONFIG = None
 cur_path =  None
@@ -24,7 +28,7 @@ def setup_config():
         CONFIG = yaml.safe_load(f)
     return CONFIG
 
-def setup(dir=None):
+def setup():
 
     CONFIG = setup_config()
 
@@ -46,32 +50,10 @@ def setup(dir=None):
         print(cases)
         exec_dict[dir] =  cases
 
+    return exec_dict
 
-    exit(1)
-    if dir is not None:
 
-        CONFIG['DIR'] = dir
-        DIR = dir
-    else:
-        DIR = CONFIG['DIR']
 
-    cur_path = get_cur_path()
-    # set up output location
-    op_loc = CONFIG['output_loc']
-
-    if not os.path.exists(op_loc):
-        os.mkdir(op_loc)
-
-    if not os.path.exists(os.path.join(op_loc,DIR)):
-        os.mkdir(os.path.join(op_loc,DIR))
-    return CONFIG, cur_path
-
-def get_file_paths(DATA_DIR):
-    print(os.path.join(DATA_DIR, 'panjiva_*.csv'))
-    all_files = sorted(glob.glob(
-        os.path.join(DATA_DIR, 'panjiva_*.csv')
-    ))
-    return all_files
 
 
 def process_data(CONFIG, file_path):
@@ -84,23 +66,18 @@ def process_data(CONFIG, file_path):
     r = processor_v1.invoke(CONFIG, file_path)
     return r
 
-def main(dir):
-
-    CONFIG, cur_path= setup(dir)
-    DATA_DIR = os.path.join(
-        CONFIG['DATA_DIR'],
-        CONFIG['DIR']
-    )
+def main():
 
     # List of all the files
-    files_paths = get_file_paths(DATA_DIR)
-    num_files = len(files_paths)
-    num_proc = min(40,num_files)
+    exec_dict = setup()
+
+    num_proc = 5
     pool = mp.Pool(processes=num_proc)
     print(pool)
-    results = [pool.apply_async( process_data, args=(CONFIG, file_path,)) for file_path in files_paths ]
-    output = [p.get() for p in results]
-    print(output)
+    for _dir,cases in exec_dict.items():
+        results = [pool.apply_async( main_model_exec.main, args=(_dir, case,)) for case in cases ]
+        output = [p.get() for p in results]
+        print(output)
     return
 
 # # ------------------------------------------------------------------------------- #
@@ -120,4 +97,4 @@ def main(dir):
 #     dir = args.dir
 # )
 
-setup()
+main()

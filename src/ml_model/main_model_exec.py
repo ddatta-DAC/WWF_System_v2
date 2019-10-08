@@ -148,7 +148,7 @@ def set_up_model(
         case
 ):
     SUBDIR =  str(case)
-    embedding_dims = config[dir]['emb_dims']
+
     embedding_dims = config[dir]['emb_dims']
     MODEL_NAME = '_'.join( [config['MODEL_NAME'], 'case', SUBDIR])
     model_obj = tf_model.model(
@@ -218,7 +218,6 @@ def main( dir, case ):
     return
 
 
-
 # ------------------------------------------------------------------------------- #
 print(' ------ ')
 parser = argparse.ArgumentParser(description='Train the models')
@@ -238,11 +237,12 @@ parser.add_argument(
 
 
 args = parser.parse_args()
-print('Calling main :: ', args.dir, args.case)
 
-main(
-    dir = args.dir,
-    case = args.case
-)
+if args.dir is not None and args.case is not None:
+    print('Calling main :: ', args.dir, args.case)
+    main(
+        dir = args.dir,
+        case = args.case
+    )
 
 

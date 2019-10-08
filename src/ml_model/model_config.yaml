@@ -4,13 +4,46 @@ OP_DIR : './../../Model_Output'
 RESULT_DIR  : './../../Model_Results'
 MODEL_NAME : 'mead'
 id_col : 'PanjivaRecordID'
+
 china_export:
   emb_dims : 16
   num_neg_samples : 8
   id_col : 'PanjivaRecordID'
   learning_rate : 0.0025
-  num_epochs: 1
+  num_epochs: 50
   batchsize : 512
   show_loss_figure : False
   save_loss_figure : False
+
+peru_export:
+  emb_dims : 12
+  num_neg_samples : 8
+  id_col : 'PanjivaRecordID'
+  learning_rate : 0.0025
+  num_epochs: 50
+  batchsize : 512
+  show_loss_figure : False
+  save_loss_figure : True
+
+us_import:
+  emb_dims : 16
+  num_neg_samples : 8
+  id_col : 'PanjivaRecordID'
+  learning_rate : 0.0025
+  num_epochs: 50
+  batchsize : 512
+  show_loss_figure : False
+  save_loss_figure : False
+
+china_import:
+  emb_dims : 12
+  num_neg_samples : 8
+  id_col : 'PanjivaRecordID'
+  learning_rate : 0.0025
+  num_epochs: 50
+  batchsize : 512
+  show_loss_figure : False
+  save_loss_figure : False
+
+
 
