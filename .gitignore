@@ -8,3 +8,7 @@
 **/__pycache__
 **/**.pyc
 /GeneratedData/
+/WWF_Domain_Data_v1/.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+*.so
