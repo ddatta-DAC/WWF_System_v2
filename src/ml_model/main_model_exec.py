@@ -57,19 +57,21 @@ def set_up_config(
         os.mkdir(os.path.join(CONFIG['model_save_dir']))
     if not os.path.exists(os.path.join(CONFIG['model_save_dir'],DIR)):
         os.mkdir(os.path.join(CONFIG['model_save_dir'],DIR))
+    if not os.path.exists(os.path.join(CONFIG['OP_DIR'], DIR, SUB_DIR)):
+        os.mkdir(os.path.join(CONFIG['OP_DIR'], DIR, SUB_DIR))
 
     MODEL_SAVE_DIR = os.path.join(
         CONFIG['model_save_dir'],
         DIR,
         SUB_DIR
     )
-
+    print(' ... ', MODEL_SAVE_DIR)
     if not os.path.exists(CONFIG['OP_DIR']):
         os.mkdir(os.path.join(CONFIG['OP_DIR']))
     if not os.path.exists(os.path.join(CONFIG['OP_DIR'], DIR)):
         os.mkdir(os.path.join(CONFIG['OP_DIR'], DIR))
-    if not os.path.exists(os.path.join(CONFIG['OP_DIR'], DIR, SUB_DIR)):
-        os.mkdir(os.path.join(CONFIG['OP_DIR'], DIR, SUB_DIR))
+    # if not os.path.exists(os.path.join(CONFIG['OP_DIR'], DIR, SUB_DIR)):
+    #     os.mkdir(os.path.join(CONFIG['OP_DIR'], DIR, SUB_DIR))
 
     OP_DIR = os.path.join(
         CONFIG['OP_DIR'],
