@@ -12,7 +12,7 @@ china_import:
     - 'HSCode'
     - 'HSCodeKeywords'
 china_export:
-  process: True
+  process: False
   'use_cols':
     - 'PanjivaRecordID'
     - 'AdminRegion'
