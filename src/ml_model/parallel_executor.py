@@ -54,23 +54,10 @@ def setup():
 
 
 
-
-
-def process_data(CONFIG, file_path):
-
-    try:
-        from . import processor_v1
-    except:
-        import processor_v1
-
-    r = processor_v1.invoke(CONFIG, file_path)
-    return r
-
 def main():
 
     # List of all the files
     exec_dict = setup()
-
     num_proc = 5
     pool = mp.Pool(processes=num_proc)
     print(pool)
@@ -79,22 +66,5 @@ def main():
         output = [p.get() for p in results]
         print(output)
     return
-
-# # ------------------------------------------------------------------------------- #
-# parser = argparse.ArgumentParser(description='Generate data for the ML model')
-# parser.add_argument(
-#     '--dir',
-#     nargs='?',
-#     type=str,
-#     help=' < Data source > ',
-#     choices=['us_import', 'china_import', 'china_export','peru_export']
-# )
-#
-#
-# args = parser.parse_args()
-# print('Calling data_generator:::', args.dir, args.case)
-# main(
-#     dir = args.dir
-# )
 
 main()

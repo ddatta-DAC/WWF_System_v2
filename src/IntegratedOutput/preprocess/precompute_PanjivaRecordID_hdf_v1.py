@@ -3,144 +3,248 @@ import os
 import sys
 import yaml
 import glob
+import time
+import multiprocessing as mp
 sys.path.append('./..')
 sys.path.append('./../..')
 sys.path.append('./../../..')
-
 try:
-    from .src.utils import country_iso_fetcher
+    from src.IntegratedOutput.preprocess.country_iso_fetcher import ISO_CODE_OBJ
 except:
-    from src.utils import country_iso_fetcher
-
-# Separate out the PanjivaRecordID s
-# that correspond to 1 , 2 or 3 human defined filters
+    from .country_iso_fetcher import ISO_CODE_OBJ
 
 
-def process_files(
-        file_paths,
-        save_dir,
-        metadata_df_1,
-        metadata_2_dict,
-        country_col
-):
-    id_list_1 = []
-    id_list_2 = []
-    id_list_3 = []
-
-    'hscode_6'
-    list_1 = list(metadata_df_1[metadata_df_1['lacey'] == 1]['hscode_6'])
-    list_2 = list(metadata_df_1[metadata_df_1['plant'] == 1]['hscode_6'])
+'''
+Perform  LEB based checks
+LEB data 2 columns : hscode_6, CountryOfOrigin 
+'''
 
 
-    for file in file_paths:
-        _cols_ = ['PanjivaRecordID','hscode_6']
+def write_df_WD(CONFIG, DIR, f_name, df):
+    working_dir = os.path.join(CONFIG['Working_Dir'],DIR)
 
-        if country_col is not None:
-            _cols_.append(country_col)
-        print(_cols_)
-        _df = pd.read_csv(file,usecols=_cols_,low_memory=False)
+    f_path = os.path.join(working_dir, f_name)
+    df.to_csv(f_path, index=None)
 
-        # convert country to iso code
-        if country_col is not None:
-            def get_iso(row):
-                res = row[country_col]
-                res = country_iso_fetcher.ISO_CODE_OBJ.get_iso_code(res)
-                return res
 
-            _df[country_col] = _df.apply(get_iso,axis=1)
+def read_df_WD(CONFIG, DIR, f_name):
+    working_dir = os.path.join(CONFIG['Working_Dir'],DIR)
+    f_path = os.path.join(working_dir, f_name)
+    df = pd.read_csv(f_path, index_col=None, low_memory=False)
+    return df
 
-        res_1 = list(_df.loc[_df['hscode_6'].isin(list_1)]['PanjivaRecordID'])
-        res_2 = list(_df.loc[_df['hscode_6'].isin(list_2)]['PanjivaRecordID'])
 
-        def aux_leb(row):
-            c = row[country_col]
-            h = int(row['hscode_6'])
-            if h in metadata_2_dict.keys() and c in metadata_2_dict[h]:
+def LEB_check_aux(row, LEB_df, target_col):
+    hscode_col = 'hscode_6'
+
+    hsc = row[hscode_col]
+
+    if hsc not in list(LEB_df[hscode_col]):
+        return 0
+    else:
+        try:
+            idx = LEB_df.loc[LEB_df[hscode_col] == hsc].index.tolist()[0]
+            _list_countries = (LEB_df.at[idx, 'CountryOfOrigin']).split(';')
+            if row[target_col] in _list_countries:
                 return 1
-            else:
-                return 0
-
-        id_list_1.extend(res_1)
-        id_list_2.extend(res_2)
-
-        if country_col is not None:
-            _df['leb'] = 0
-            _df['leb'] = _df.apply(aux_leb,axis=1)
-            res_3 = list(_df.loc[_df['leb']==1]['PanjivaRecordID'])
-            id_list_3.extend(res_3)
+        except:
+            return 0
+    return 0
 
 
+def LEB_file_proc(file_path, CONFIG, DIR, LEB_df):
+    df = pd.read_csv(
+        file_path,
+        low_memory=False,
+        usecols=CONFIG[DIR]['LEB_columns'],
+        index_col=None
+    )
+
+    # Convert to iso code
+
+    target_col = CONFIG[DIR]['CountryOfOrigin']
+    df[target_col] = df[target_col].apply(ISO_CODE_OBJ.get_iso_code)
+
+    df['LEB_flag'] = 0
+    df['hscode_6'] = df['hscode_6'].astype(str)
+    df['LEB_flag'] = df.apply(LEB_check_aux, axis=1, args=(LEB_df, target_col))
+
+    # ======
+    # Write df to processing temp location
+    # ======
+    f_name = 'tmp_' + file_path.split('_')[-1]
+    del df[target_col]
+
+    write_df_WD(CONFIG, DIR, f_name, df)
+    return True
 
 
-    # Save the data  files
-    op_file = os.path.join(save_dir,'Panjiva_records_hdf_1.txt')
-    with open(op_file, 'w') as f:
-        for item in id_list_1:
-            f.write("%s\n" % item)
+def get_LEB_match_records(CONFIG, DIR):
+    if CONFIG[DIR]['CountryOfOrigin'] is False:
+        return None
 
-    op_file = os.path.join(save_dir, 'Panjiva_records_hdf_2.txt')
-    with open(op_file, 'w') as f:
-        for item in id_list_2:
-            f.write("%s\n" % item)
+    LEB_df = pd.read_csv(CONFIG['LEB_DATA_FILE'], low_memory=False, index_col=None)
+    LEB_df['hscode_6'] = LEB_df['hscode_6'].astype(str)
 
-    if country_col is not None:
-        op_file = os.path.join(save_dir, 'Panjiva_records_hdf_3.txt')
-        with open(op_file, 'w') as f:
-            for item in id_list_3:
-                f.write("%s\n" % item)
+    # ============
+    # These are the segmented files , with actual data though cleaned through initial processing
+    # ============
+    file_list = sorted(glob.glob(
+        os.path.join(
+            CONFIG['Data_RealSegmented_LOC'], DIR, '**', 'data_test_**.csv')
+    ))
 
-    return
+    import multiprocessing as mp
+    num_proc = 10
+    pool = mp.Pool(processes=num_proc)
+    print(pool)
+
+    results = [
+        pool.apply_async(
+            LEB_file_proc,
+            args=(file_path, CONFIG, DIR, LEB_df,)
+        ) for file_path in file_list
+    ]
+    output = [p.get() for p in results]
+    print (output)
+
+
+
+    return None
+
+# ===========================
+#  CITES check
+# ===========================
+def HSCode_check_aux(row, hscode_list):
+    hscode_col = 'hscode_6'
+    hsc = row[hscode_col]
+    if hsc  in hscode_list:
+        return 1
+    else:
+        return 0
+
+
+def FLAG_file_proc(file_path, CONFIG, DIR, hscode_list, flag_column):
+
+    df = pd.read_csv(
+        file_path,
+        low_memory=False,
+        index_col=None
+    )
+
+    df[flag_column] = 0
+    df['hscode_6'] = df['hscode_6'].astype(str)
+    df[flag_column] = df.apply(HSCode_check_aux, axis=1, args=(hscode_list,))
+
+    # ======
+    # Write df to processing temp location
+    # ======
+    f_name = 'tmp_' + file_path.split('_')[-1]
+    write_df_WD(CONFIG, DIR, f_name, df)
+    return True
+
+
+def common_dispatcher(CONFIG, DIR, hscode_list, flag_column):
+    # ============
+    # The input now is from Working_Dir
+    # ============
+    file_list = sorted(glob.glob(
+        os.path.join(
+            CONFIG['Working_Dir'], DIR, '**.csv')
+    ))
+
+    num_proc = 10
+    pool = mp.Pool(processes=num_proc)
+
+    results = [
+        pool.apply_async(
+            FLAG_file_proc,
+            args=(file_path, CONFIG, DIR, hscode_list,flag_column, )
+        ) for file_path in file_list
+    ]
+    output = [p.get() for p in results]
+    print(output)
+    return True
+
+
+def get_match_records(CONFIG, DIR):
+
+    sources = [ 'CITES', 'WWF_HighRisk', 'IUCN_RedList']
+
+    for source in sources:
+        flag_column = source + '_flag'
+        data_file_key = source + '_DATA_FILE'
+
+        source_df = pd.read_csv(
+            CONFIG[data_file_key],
+            low_memory=False,
+            index_col=None,
+            header=None
+        )
+
+        hscode_list = list(source_df[0])
+        t1 = time.time()
+        common_dispatcher(CONFIG, DIR, hscode_list, flag_column)
+        t2 = time.time()
+        print(' Time for ' + source + ' checks ', t2 - t1)
+
+
+
 
 def main():
-    CONFIG = None
     CONFIG_FILE = 'precompute_PanjivaRecordID_hdf.yaml'
     with open(CONFIG_FILE) as f:
         CONFIG = yaml.safe_load(f)
 
+    if not os.path.exists(CONFIG['Working_Dir']):
+        os.mkdir(CONFIG['Working_Dir'])
+    if not os.path.exists(CONFIG['HDF_OUTPUT_LOC']):
+        os.mkdir(CONFIG['HDF_OUTPUT_LOC'])
 
-    SAVE_DIR = CONFIG['TARGET_DIR']
-    if not os.path.exists(SAVE_DIR):
-        os.mkdir(SAVE_DIR)
+    process_DIRS = CONFIG['process_dirs']
 
-    dirs = CONFIG['dirs']
-    metadata_df_1 = pd.read_csv(CONFIG['hs_code_metadata_file'])
-    metadata_df_2 = pd.read_csv(CONFIG['leb_metadata_file'])
+    for DIR in process_DIRS:
 
-    metadata_2_dict = {}
-    # split metadata_df_2 into a dictionary
-    for _,row in metadata_df_2.iterrows():
-        k = int(row['hscode_6'])
-        v = [_ for _ in row['CountryOfOrigin'].split(';')]
-        metadata_2_dict[k] = v
+        if not os.path.exists(
+                os.path.join(CONFIG['Working_Dir'], DIR)
+        ):
+            os.mkdir(os.path.join(CONFIG['Working_Dir'], DIR))
 
-    for _dir in dirs:
-        data_dir = os.path.join(CONFIG['SRC_DIR'],_dir)
-        all_files = glob.glob(
-            os.path.join(
-                data_dir,
-                '*filtered.csv'
-            )
+        if CONFIG[DIR]['process_LEB']:
+            t1 = time.time()
+            get_LEB_match_records(CONFIG, DIR)
+            t2 = time.time()
+            print(' Time for LEB checks ', t2 - t1)
+
+
+
+        get_match_records(CONFIG, DIR)
+
+        # =====
+        # Combine the files
+        # =====
+        file_loc = os.path.join(CONFIG['Working_Dir'], DIR)
+        file_list = sorted(glob.glob(
+            os.path.join(file_loc,'**.csv'))
         )
 
-        save_dir = os.path.join(
-            CONFIG['TARGET_DIR'],
-            _dir
+        master_df = None
+        for _file in file_list:
+            _tmpdf = pd.read_csv(_file, index_col=None,low_memory=False)
+            if master_df is None:
+                master_df = _tmpdf
+            else:
+                master_df = master_df.append(_tmpdf, ignore_index=True)
+        op_loc = os.path.join(CONFIG['HDF_OUTPUT_LOC'],DIR)
+        if not os.path.exists(op_loc):
+            os.mkdir(op_loc)
+
+        f_name = 'HDF_results.csv'
+        op_f_path = os.path.join(
+            op_loc, f_name
         )
+        master_df.to_csv(op_f_path,index=None)
+    return
 
-        if not os.path.exists(save_dir):
-            os.mkdir(save_dir)
-        print('Processing ',_dir)
-        country_col = CONFIG[_dir]['CountryOfOrigin']
-        if country_col == 'None':
-            country_col = None
-
-        process_files(all_files, save_dir,metadata_df_1,metadata_2_dict,country_col)
 
 main()
-
-
-
-
-
-
-

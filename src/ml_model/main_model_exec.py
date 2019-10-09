@@ -68,6 +68,7 @@ def set_up_config(
     print(' ... ', MODEL_SAVE_DIR)
     if not os.path.exists(CONFIG['OP_DIR']):
         os.mkdir(os.path.join(CONFIG['OP_DIR']))
+
     if not os.path.exists(os.path.join(CONFIG['OP_DIR'], DIR)):
         os.mkdir(os.path.join(CONFIG['OP_DIR'], DIR))
     # if not os.path.exists(os.path.join(CONFIG['OP_DIR'], DIR, SUB_DIR)):

@@ -521,7 +521,7 @@ def create_negative_samples_v1():
 
     results = []
 
-    results = Parallel(n_jobs=10)(
+    results = Parallel(n_jobs=50)(
         delayed
         (create_negative_samples_v1_aux)(
             _i,

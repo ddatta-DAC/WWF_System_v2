@@ -1,21 +1,53 @@
-'dirs':
+'process_dirs':
   - china_import
-  - china_export
-  - us_import
-  - peru_export
+Data_RealSegmented_LOC : './../../../GeneratedData/SegmentedData'
+
+LEB_DATA_FILE : './../../../WWF_Domain_Data_v1/GeneratedData/LEB/LEB_hscode_country.csv'
+CITES_DATA_FILE : './../../../WWF_Domain_Data_v1/GeneratedData/HSCodes/CITES_HS_Codes.txt'
+IUCN_RedList_DATA_FILE : './../../../WWF_Domain_Data_v1/GeneratedData/HSCodes/IUCN_RedList_HS_Codes.txt'
+WWF_HighRisk_DATA_FILE : './../../../WWF_Domain_Data_v1/GeneratedData/HSCodes/WWF_HighRisk_HS_Codes.txt'
+
+Working_Dir : './../../../Working_Dir'
+HDF_OUTPUT_LOC :  './../../../HDF_Output'
+
 'hs_code_metadata_file' : ../../metadata/collated_hscode_filters.csv
 'leb_metadata_file' : ../../metadata/LEB_hscode_country.csv
 'SRC_DIR': ../../generated_data
 'TARGET_DIR' : ../../generated_data/HDF
 'china_import' :
-  'CountryOfOrigin' : 'CountryOfSale'
-  'max' : 3
+  CountryOfOrigin : 'CountryOfSale'
+  process_LEB : True
+  process_CITES : True
+  LEB_columns:
+    - 'PanjivaRecordID'
+    - 'CountryOfSale'
+    - 'hscode_6'
+
 'china_export' :
   'CountryOfOrigin' : 'CountryOfSale'
-  'max' : 3
-'us_import' :
-  'CountryOfOrigin' : 'ShipmentOrigin'
-  'max' : 3
+  process_LEB : True
+  process_CITES : True
+  LEB_columns:
+    - 'PanjivaRecordID'
+    - 'CountryOfSale'
+    - 'hscode_6'
+
+us_import :
+  CountryOfOrigin : 'ShipmentOrigin'
+  process_LEB : True
+  process_CITES : True
+  LEB_columns:
+    - 'PanjivaRecordID'
+    - 'ShipmentOrigin'
+    - 'hscode_6'
+
 'peru_export' :
-  'CountryOfOrigin' : None
-  'max' : 2
+  CountryOfOrigin : None
+  process_LEB : True
+  process_CITES : True
+  LEB_columns:
+    - 'PanjivaRecordID'
+    - 'CountryOfSale'
+    - 'hscode_6'
+
+
