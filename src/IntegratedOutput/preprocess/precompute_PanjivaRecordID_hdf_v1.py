@@ -63,17 +63,21 @@ def LEB_file_proc(file_path, CONFIG, DIR, LEB_df):
     # Convert to iso code
 
     target_col = CONFIG[DIR]['CountryOfOrigin']
-    df[target_col] = df[target_col].apply(ISO_CODE_OBJ.get_iso_code)
+    if target_col is False:
+        df['LEB_flag'] = 0
 
-    df['LEB_flag'] = 0
-    df['hscode_6'] = df['hscode_6'].astype(str)
-    df['LEB_flag'] = df.apply(LEB_check_aux, axis=1, args=(LEB_df, target_col))
+    else:
 
+        df[target_col] = df[target_col].apply(ISO_CODE_OBJ.get_iso_code)
+        df['LEB_flag'] = 0
+        df['hscode_6'] = df['hscode_6'].astype(str)
+        df['LEB_flag'] = df.apply(LEB_check_aux, axis=1, args=(LEB_df, target_col))
+        del df[target_col]
     # ======
     # Write df to processing temp location
     # ======
     f_name = 'tmp_' + file_path.split('_')[-1]
-    del df[target_col]
+
 
     write_df_WD(CONFIG, DIR, f_name, df)
     return True
@@ -107,8 +111,6 @@ def get_LEB_match_records(CONFIG, DIR):
     ]
     output = [p.get() for p in results]
     print (output)
-
-
 
     return None
 

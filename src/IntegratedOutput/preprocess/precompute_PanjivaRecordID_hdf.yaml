@@ -1,5 +1,9 @@
-'process_dirs':
-  - china_import
+process_dirs:
+  - 'china_import'
+  - 'china_export'
+  - 'us_import'
+  - 'peru_export'
+
 Data_RealSegmented_LOC : './../../../GeneratedData/SegmentedData'
 
 LEB_DATA_FILE : './../../../WWF_Domain_Data_v1/GeneratedData/LEB/LEB_hscode_country.csv'
@@ -42,12 +46,11 @@ us_import :
     - 'hscode_6'
 
 'peru_export' :
-  CountryOfOrigin : None
+  CountryOfOrigin : False
   process_LEB : True
   process_CITES : True
   LEB_columns:
     - 'PanjivaRecordID'
-    - 'CountryOfSale'
     - 'hscode_6'
 
 
