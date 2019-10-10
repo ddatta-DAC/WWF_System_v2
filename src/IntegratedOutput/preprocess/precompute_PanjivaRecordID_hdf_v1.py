@@ -59,15 +59,18 @@ def LEB_file_proc(file_path, CONFIG, DIR, LEB_df):
         usecols=CONFIG[DIR]['LEB_columns'],
         index_col=None
     )
-
-    # Convert to iso code
-
+    print(len(df))
+    
     target_col = CONFIG[DIR]['CountryOfOrigin']
+    
+    
     if target_col is False:
+        print( 'NO LEB')    
         df['LEB_flag'] = 0
 
     else:
-
+         # Convert to iso code
+        target_col = CONFIG[DIR]['CountryOfOrigin']
         df[target_col] = df[target_col].apply(ISO_CODE_OBJ.get_iso_code)
         df['LEB_flag'] = 0
         df['hscode_6'] = df['hscode_6'].astype(str)
@@ -84,8 +87,6 @@ def LEB_file_proc(file_path, CONFIG, DIR, LEB_df):
 
 
 def get_LEB_match_records(CONFIG, DIR):
-    if CONFIG[DIR]['CountryOfOrigin'] is False:
-        return None
 
     LEB_df = pd.read_csv(CONFIG['LEB_DATA_FILE'], low_memory=False, index_col=None)
     LEB_df['hscode_6'] = LEB_df['hscode_6'].astype(str)
@@ -217,8 +218,6 @@ def main():
             get_LEB_match_records(CONFIG, DIR)
             t2 = time.time()
             print(' Time for LEB checks ', t2 - t1)
-
-
 
         get_match_records(CONFIG, DIR)
 
