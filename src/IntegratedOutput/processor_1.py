@@ -128,7 +128,7 @@ def main(dir):
     final_df = combine(model_op_df, hdf_op_df)
     OP_LOC = CONFIG['MODEL_RESULTS_LOC']
     f_name = CONFIG['COMBINED_OP_FILE_NAME']
-    f_path = os.path.join(OP_LOC,f_name)
+    f_path = os.path.join(OP_LOC,DIR, f_name)
     final_df.to_csv(
         f_path,
         index=None
