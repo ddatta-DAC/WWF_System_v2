@@ -111,6 +111,7 @@ def combine(model_op_df, hdf_op_df):
 
     combined_df['combined_score'] = 0
     _max = max(list(combined_df['hdf_score']))
+    _max = max(_max,1)
     combined_df['combined_score'] = combined_df.apply(
         calculate_combined_score, axis= 1, args=(_max,)
     )
