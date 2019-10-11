@@ -102,7 +102,7 @@ def combine(model_op_df, hdf_op_df):
     def calculate_combined_score(row,_max):
         s1 = 1 - row['score']
         s2 = row['hdf_score']
-        s1* math.exp(s2/_max)
+        return s1* math.exp(s2/_max)
 
     combined_df['hdf_score'] = 0
     combined_df['hdf_score'] = combined_df.apply(
