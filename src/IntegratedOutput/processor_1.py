@@ -93,7 +93,7 @@ def combine(model_op_df, hdf_op_df):
     # ==========
 
     def get_combined_hdf_score(row):
-        _list = ['LEB_flag', 'CITES_flag', 'WWF_HighRisk_flag', 'IUCN_RedList_flag']
+        _list = ['LEB_flag', 'CITES_flag', 'WWF_HighRisk_flag', 'IUCN_RedList_flag','Lacey_Act_Flag']
         _sum = 0
         for c in _list:
             _sum += row[c]
