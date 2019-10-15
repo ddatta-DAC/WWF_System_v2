@@ -5,13 +5,12 @@ process_dirs:
   - 'peru_export'
 
 Data_RealSegmented_LOC : './../../../GeneratedData/SegmentedData'
-
 LEB_DATA_FILE : './../../../WWF_Domain_Data_v1/GeneratedData/LEB/LEB_hscode_country.csv'
 CITES_DATA_FILE : './../../../WWF_Domain_Data_v1/GeneratedData/HSCodes/CITES_HS_Codes.txt'
 IUCN_RedList_DATA_FILE : './../../../WWF_Domain_Data_v1/GeneratedData/HSCodes/IUCN_RedList_HS_Codes.txt'
-Lacey_Act_Include_DATA_FILE : './../../../metadata/lacey_act_true.txt'
-Lacey_Act_Exclude_DATA_FILE : './../../../metadata/lacey_act_exceptions.txt'
-
+WWF_HighRisk_DATA_FILE : './../../../WWF_Domain_Data_v1/GeneratedData/HSCodes/WWF_HighRisk_HS_Codes.txt'
+Lacey_Act_include_DATA_FILE : './../../../metadata/lacey_act_true.txt'
+Lacey_Act_exclude_DATA_FILE : './../../../metadata/lacey_act_exceptions.txt'
 Working_Dir : './../../../Working_Dir'
 HDF_OUTPUT_LOC :  './../../../HDF_Output'
 

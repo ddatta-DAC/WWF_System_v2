@@ -264,7 +264,7 @@ def append_lacey_act_flag(
 
 def get_match_records(CONFIG, DIR):
 
-    sources = [ 'CITES', 'WWF_HighRisk', 'IUCN_RedList', 'Lacey_Act']
+    sources = [ 'CITES', 'WWF_HighRisk', 'IUCN_RedList']
 
     for source in sources:
         flag_column = source + '_flag'
@@ -289,8 +289,8 @@ def get_match_records(CONFIG, DIR):
 
     source = 'Lacey_Act'
     flag_column = source + '_flag'
-    hscode_include_key = '_'.join(source, 'include', '_DATA_FILE')
-    hscode_exclude_key = '_'.join(source, 'exclude', '_DATA_FILE')
+    hscode_include_key = '_'.join([source, 'include', 'DATA_FILE'])
+    hscode_exclude_key = '_'.join([source, 'exclude', 'DATA_FILE'])
 
     hscode_include_df = pd.read_csv(
             CONFIG[hscode_include_key],
