@@ -169,13 +169,56 @@ def common_dispatcher(CONFIG, DIR, hscode_list, flag_column):
     print(output)
     return True
 
+# ========
+#  Row -wise validator function
+# ========
+def lacey_check_aux(row, hscode_include_list, hscode_exclude_list):
+    row_hscode = row['hscode_6']
+    # check 6 digit s
+
+    if row_hscode in hscode_exclude_list: return 0
+    if row_hscode in hscode_include_list : return 1
+
+    row_hscode = row_hscode[:4]
+    if row_hscode in hscode_include_list : return 1
+
+    return 0
+
+# ========
+#  Nested function that handles each file
+# ========
+def LaceyAct_file_proc(
+        file_path,
+        CONFIG,
+        DIR,
+        hscode_include_list,
+        hscode_exclude_list,
+        flag_column
+):
+    df = pd.read_csv(
+        file_path,
+        low_memory=False,
+        index_col=None
+    )
+
+    df[flag_column] = 0
+    df['hscode_6'] = df['hscode_6'].astype(str)
+    df[flag_column] = df.apply(
+        lacey_check_aux,
+        axis=1,
+        args=(hscode_include_list, hscode_exclude_list)
+    )
+
+    # ======
+    # Write df to processing temp location
+    # ======
+    f_name = 'tmp_' + file_path.split('_')[-1]
+    write_df_WD(CONFIG, DIR, f_name, df)
+    return True
+
 # -------------- #
 #  Function to add in lacey act flag
 # -------------- #
-
-
-
-
 def append_lacey_act_flag(
         CONFIG,
         DIR,
@@ -183,54 +226,7 @@ def append_lacey_act_flag(
         hscode_exclude_list,
         flag_column
     ):
-    # ========
-    #  Row -wise validator function
-    # ========
-    def lacey_check_aux(row, hscode_include_list, hscode_exclude_list):
-        row_hscode = row['hscode_6']
-        # check 6 digit s
 
-        if row_hscode in hscode_exclude_list: return 0
-        if row_hscode in hscode_include_list : return 1
-
-        row_hscode = row_hscode[:4]
-        if row_hscode in hscode_include_list : return 1
-
-        return 0
-
-    # ========
-    #  Nested function that handles each file
-    # ========
-    def LaceyAct_file_proc(
-            file_path,
-            CONFIG,
-            DIR,
-            hscode_include_list,
-            hscode_exclude_list,
-            flag_column
-    ):
-        df = pd.read_csv(
-            file_path,
-            low_memory=False,
-            index_col=None
-        )
-
-        df[flag_column] = 0
-        df['hscode_6'] = df['hscode_6'].astype(str)
-        df[flag_column] = df.apply(
-            lacey_check_aux,
-            axis=1,
-            args=(hscode_include_list, hscode_exclude_list)
-        )
-
-        # ======
-        # Write df to processing temp location
-        # ======
-        f_name = 'tmp_' + file_path.split('_')[-1]
-        write_df_WD(CONFIG, DIR, f_name, df)
-        return True
-
-        # ====== end of  nested functions ======== #
 
     # Get all the files from Working directory
 
