@@ -12,3 +12,10 @@
 __pycache__/
 *.py[cod]
 *.so
+/Model_Results/china_export/combined_output.csv
+/Model_Results/china_export/collated_model_output.csv
+/Model_Results/china_import/collated_model_output.csv
+/Model_Results/china_import/combined_output.csv
+/Model_Results/us_import/collated_model_output.csv
+/Model_Results/us_import/combined_output.csv
+/Working_Dir/
