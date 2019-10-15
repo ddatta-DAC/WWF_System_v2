@@ -8,6 +8,7 @@ import multiprocessing as mp
 sys.path.append('./..')
 sys.path.append('./../..')
 sys.path.append('./../../..')
+
 try:
     from src.IntegratedOutput.preprocess.country_iso_fetcher import ISO_CODE_OBJ
 except:
@@ -62,8 +63,7 @@ def LEB_file_proc(file_path, CONFIG, DIR, LEB_df):
     print(len(df))
     
     target_col = CONFIG[DIR]['CountryOfOrigin']
-    
-    
+
     if target_col is False:
         print( 'NO LEB')    
         df['LEB_flag'] = 0
@@ -169,10 +169,102 @@ def common_dispatcher(CONFIG, DIR, hscode_list, flag_column):
     print(output)
     return True
 
+# -------------- #
+#  Function to add in lacey act flag
+# -------------- #
+
+
+
+
+def append_lacey_act_flag(
+        CONFIG,
+        DIR,
+        hscode_include_list,
+        hscode_exclude_list,
+        flag_column
+    ):
+    # ========
+    #  Row -wise validator function
+    # ========
+    def lacey_check_aux(row, hscode_include_list, hscode_exclude_list):
+        row_hscode = row['hscode_6']
+        # check 6 digit s
+
+        if row_hscode in hscode_exclude_list: return 0
+        if row_hscode in hscode_include_list : return 1
+
+        row_hscode = row_hscode[:4]
+        if row_hscode in hscode_include_list : return 1
+
+        return 0
+
+    # ========
+    #  Nested function that handles each file
+    # ========
+    def LaceyAct_file_proc(
+            file_path,
+            CONFIG,
+            DIR,
+            hscode_include_list,
+            hscode_exclude_list,
+            flag_column
+    ):
+        df = pd.read_csv(
+            file_path,
+            low_memory=False,
+            index_col=None
+        )
+
+        df[flag_column] = 0
+        df['hscode_6'] = df['hscode_6'].astype(str)
+        df[flag_column] = df.apply(
+            lacey_check_aux,
+            axis=1,
+            args=(hscode_include_list, hscode_exclude_list)
+        )
+
+        # ======
+        # Write df to processing temp location
+        # ======
+        f_name = 'tmp_' + file_path.split('_')[-1]
+        write_df_WD(CONFIG, DIR, f_name, df)
+        return True
+
+        # ====== end of  nested functions ======== #
+
+    # Get all the files from Working directory
+
+    file_list = sorted(glob.glob(
+        os.path.join(
+            CONFIG['Working_Dir'], DIR, '**.csv')
+    ))
+
+    num_proc = 20
+    pool = mp.Pool(processes=num_proc)
+    results = [
+        pool.apply_async(
+            LaceyAct_file_proc,
+            args=(
+                file_path,
+                CONFIG,
+                DIR,
+                hscode_include_list,
+                hscode_exclude_list,
+                flag_column,
+            )
+        ) for file_path in file_list
+    ]
+    output = [p.get() for p in results]
+    print(output)
+    return True
+
+
+
+
 
 def get_match_records(CONFIG, DIR):
 
-    sources = [ 'CITES', 'WWF_HighRisk', 'IUCN_RedList']
+    sources = [ 'CITES', 'WWF_HighRisk', 'IUCN_RedList', 'Lacey_Act']
 
     for source in sources:
         flag_column = source + '_flag'
@@ -191,6 +283,40 @@ def get_match_records(CONFIG, DIR):
         t2 = time.time()
         print(' Time for ' + source + ' checks ', t2 - t1)
 
+    """
+    Add in Lacey Act  Flag 
+    """
+
+    source = 'Lacey_Act'
+    flag_column = source + '_flag'
+    hscode_include_key = '_'.join(source, 'include', '_DATA_FILE')
+    hscode_exclude_key = '_'.join(source, 'exclude', '_DATA_FILE')
+
+    hscode_include_df = pd.read_csv(
+            CONFIG[hscode_include_key],
+            low_memory=False,
+            index_col=None,
+            header=None
+        )
+
+    hscode_exclude_df = pd.read_csv(
+        CONFIG[hscode_exclude_key],
+        low_memory=False,
+        index_col=None,
+        header=None
+    )
+
+    hscode_include = list(hscode_include_df[0].astype(str))
+    hscode_exclude = list(hscode_exclude_df[0].astype(str))
+
+    append_lacey_act_flag(
+        CONFIG,
+        DIR,
+        hscode_include,
+        hscode_exclude,
+        flag_column
+    )
+    return 0
 
 
 
