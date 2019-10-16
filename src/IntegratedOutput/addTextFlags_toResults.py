@@ -76,13 +76,15 @@ def append_text_flags(CONFIG, DIR):
 
     base_file = os.path.join(CONFIG['MODEL_RESULTS_LOC'], DIR, CONFIG['COMBINED_OP_FILE_NAME'])
     base_df = pd.read_csv(base_file, low_memory=False, index_col=None)
+    flag_column = CONFIG['text_flag']
+    base_df[flag_column] = 0
+
 
     # Chunk the data and set the flag
     num_chunks = 100
     list_df = np.array_split(base_df, num_chunks)
     pool = mp.Pool(processes=num_chunks)
 
-    flag_column = CONFIG['text_flag']
     results = [
         pool.apply_async(
             set_flag_aux,
