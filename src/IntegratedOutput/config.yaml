@@ -1,4 +1,4 @@
 MODEL_RESULTS_LOC: './../../Model_Results'
 COLLATED_MODEL_OP_FILE_NAME : 'collated_model_output.csv'
 HDF_OUTPUT_LOC : './../../HDF_Output'
-'COMBINED_OP_FILE_NAME' : 'combined_output.csv'
+COMBINED_OP_FILE_NAME : 'combined_output.csv'
