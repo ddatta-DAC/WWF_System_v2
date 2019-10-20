@@ -4,6 +4,7 @@ import sys
 import yaml
 import glob
 import time
+
 import multiprocessing as mp
 sys.path.append('./..')
 sys.path.append('./../..')
@@ -99,7 +100,7 @@ def get_LEB_match_records(CONFIG, DIR):
             CONFIG['Data_RealSegmented_LOC'], DIR, '**', 'data_test_**.csv')
     ))
 
-    import multiprocessing as mp
+
     num_proc = 10
     pool = mp.Pool(processes=num_proc)
     print(pool)
@@ -316,7 +317,7 @@ def get_match_records(CONFIG, DIR):
 
 
 
-def main():
+def main_aux():
     CONFIG_FILE = 'precompute_PanjivaRecordID_hdf.yaml'
     with open(CONFIG_FILE) as f:
         CONFIG = yaml.safe_load(f)
@@ -369,5 +370,24 @@ def main():
         master_df.to_csv(op_f_path,index=None)
     return
 
+def get_cur_path():
+    import inspect
+    this_file_path = '/'.join(
+        os.path.abspath(
+            inspect.stack()[0][1]
+        ).split('/')[:-1]
+    )
+
+    # os.chdir(this_file_path)
+    print(os.getcwd())
+    return this_file_path
+
+
+def main():
+    old_path = os.getcwd()
+    cur_path =  get_cur_path()
+    os.chdir(cur_path)
+    main_aux()
+    os.chdir(old_path)
 
 main()
